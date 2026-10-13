@@ -1,0 +1,15 @@
+{
+  "name": "airport-dbms-web",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Vite Frontend for Airport & Airline Passenger and Cargo Logistics Management DBMS",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vite": "^5.2.11"
+  }
+}

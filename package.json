@@ -1,0 +1,25 @@
+{
+  "name": "airport-airline-logistics-dbms",
+  "version": "2.0.0",
+  "description": "Airport & Airline Passenger and Cargo Logistics Management System - Full-Stack DBMS Project",
+  "private": true,
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=web\"",
+    "build": "npm run build --workspace=web && npm run build --workspace=server",
+    "preview": "npm run preview --workspace=web",
+    "test": "npm run test --workspace=server",
+    "lint": "eslint . --ext .js",
+    "db:reset": "node ./scripts/db-reset.js",
+    "db:seed": "node ./scripts/db-seed.js",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

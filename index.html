@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airport & Airline Passenger and Cargo Logistics Management System</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="brand">
+      <div class="brand-logo">✈️</div>
+      <div>
+        <div class="brand-title">AERO LOGISTICS SYSTEM</div>
+        <div class="brand-subtitle">Passenger & Cargo Command Center</div>
+      </div>
+    </div>
+
+    <div class="nav-center" role="tablist" aria-label="Main Navigation">
+      <button class="nav-btn active" data-tab="tab-dashboard" role="tab" aria-selected="true">📊 Overview</button>
+      <button class="nav-btn" data-tab="tab-passenger" role="tab" aria-selected="false">👤 Passenger Services</button>
+      <button class="nav-btn" data-tab="tab-operations" role="tab" aria-selected="false">🛫 Fleet & Ops</button>
+      <button class="nav-btn" data-tab="tab-cargo" role="tab" aria-selected="false">📦 Cargo & Customs</button>
+      <button class="nav-btn" data-tab="tab-sql" role="tab" aria-selected="false">⚡ SQL Sandbox</button>
+      <button class="nav-btn" data-tab="tab-erd" role="tab" aria-selected="false">🗄️ ERD Model</button>
+    </div>
+
+    <div class="nav-right">
+      <div class="role-badge" title="Click to switch role or log in">
+        <div class="status-dot"></div>
+        <span id="active-role-display">Role: Admin</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+
+    <!-- 1. DASHBOARD OVERVIEW TAB -->
+    <section id="tab-dashboard" class="tab-content active" role="tabpanel">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Active Flights Today</span>
+            <span class="stat-icon">✈️</span>
+          </div>
+          <div class="stat-value" id="stat-active-flights">12</div>
+          <div class="stat-desc">DEL • BOM • BLR • DXB • LHR</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Passengers Checked-In</span>
+            <span class="stat-icon">🎟️</span>
+          </div>
+          <div class="stat-value" id="stat-passengers-count">14</div>
+          <div class="stat-desc">Real-time DB count</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Manifested Cargo Weight</span>
+            <span class="stat-icon">📦</span>
+          </div>
+          <div class="stat-value" id="stat-cargo-weight">11.7 Tons</div>
+          <div class="stat-desc" id="stat-customs-cleared">Customs cleared: 85%</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Gate Utilization</span>
+            <span class="stat-icon">🚪</span>
+          </div>
+          <div class="stat-value" id="stat-gate-utilization">65%</div>
+          <div class="stat-desc" id="stat-gate-conflicts">0 Gate Conflicts</div>
+        </div>
+      </div>
+
+      <!-- Upcoming Flight Schedules Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🛫 Master Flight Dispatch Radar</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-flights">↻ Refresh Live Radar</button>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Flight No</th>
+                <th>Airline</th>
+                <th>Tail / Aircraft Model</th>
+                <th>Route (Dep ➔ Arr)</th>
+                <th>Gate</th>
+                <th>Scheduled Dep</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-flights-master">
+              <!-- Rendered dynamically by dashboard.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PASSENGER SERVICES TAB -->
+    <section id="tab-passenger" class="tab-content" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🔍 Passenger Flight Discovery & Ticket Booking Engine</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Origin Airport</label>
+            <select class="form-select" id="search-origin">
+              <option value="ALL">All Origins</option>
+              <option value="DEL">DEL - New Delhi (IGIA)</option>
+              <option value="BOM">BOM - Mumbai (CSMIA)</option>
+              <option value="BLR">BLR - Bengaluru (KIA)</option>
+              <option value="DXB">DXB - Dubai International</option>
+              <option value="LHR">LHR - London Heathrow</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Destination Airport</label>
+            <select class="form-select" id="search-dest">
+              <option value="ALL">All Destinations</option>
+              <option value="DEL">DEL - New Delhi (IGIA)</option>
+              <option value="BOM">BOM - Mumbai (CSMIA)</option>
+              <option value="BLR">BLR - Bengaluru (KIA)</option>
+              <option value="DXB">DXB - Dubai International</option>
+              <option value="LHR">LHR - London Heathrow</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Operating Carrier</label>
+            <select class="form-select" id="search-carrier">
+              <option value="ALL">All Carriers</option>
+              <option value="Air India">Air India (AI)</option>
+              <option value="IndiGo">IndiGo (6E)</option>
+              <option value="Emirates">Emirates (EK)</option>
+              <option value="British Airways">British Airways (BA)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Travel Date</label>
+            <input type="date" class="form-input" id="search-date">
+          </div>
+
+          <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn btn-primary" id="btn-search-flights">Search Flights</button>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Flight</th>
+                <th>Airline</th>
+                <th>Route</th>
+                <th>Dep Time</th>
+                <th>Arr Time</th>
+                <th>Base Fare</th>
+                <th>Seat & Reserve</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-passenger-search">
+              <!-- Rendered dynamically by passenger.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PNR & Baggage Lookup Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🎫 PNR Booking Management & Checked Baggage Tracker</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Enter 6-8 Character PNR Reference</label>
+            <input type="text" class="form-input" id="input-pnr" placeholder="e.g. PNR101A" value="PNR101A">
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn btn-primary" id="btn-lookup-pnr">Retrieve Booking</button>
+          </div>
+        </div>
+
+        <div id="pnr-result-box" style="display: none; padding: 1.25rem; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. FLEET & OPERATIONS TAB -->
+    <section id="tab-operations" class="tab-content" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🛠️ Aircraft Fleet Status & Maintenance Ledger (12 Aircraft)</div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tail Number</th>
+                <th>Airline Carrier</th>
+                <th>Aircraft Model</th>
+                <th>Logged Hours</th>
+                <th>Status</th>
+                <th>Maintenance History</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-fleet">
+              <!-- Rendered dynamically by operations.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Crew Safety & Duty Hours Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">👨‍✈️ Flight Crew Duty Hours Audit (Max 14-Hour Safety Rule)</div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Emp Code</th>
+                <th>Crew Member</th>
+                <th>Role</th>
+                <th>Assigned Flight</th>
+                <th>Shift Window</th>
+                <th>Shift Duty Hours</th>
+                <th>Compliance Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-crew">
+              <!-- Rendered dynamically by operations.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CARGO & CUSTOMS TAB -->
+    <section id="tab-cargo" class="tab-content" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📦 Air Waybill (AWB) Freight Logistics & Customs Pipeline</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Filter Cargo Category</label>
+            <select class="form-select" id="cargo-filter-type">
+              <option value="ALL">All Categories</option>
+              <option value="Perishable">Perishable (Pharma / Vaccines)</option>
+              <option value="Fragile">Fragile (Electronics)</option>
+              <option value="Hazardous">Hazardous (Aviation Chemicals)</option>
+              <option value="General">General Merchandise</option>
+              <option value="Valuable">Valuable (Precious Metals)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Customs Inspection Status</label>
+            <select class="form-select" id="cargo-filter-customs">
+              <option value="ALL">All Statuses</option>
+              <option value="Pending Inspection">Pending Inspection</option>
+              <option value="Cleared">Cleared</option>
+              <option value="Held">Held</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Air Waybill (AWB)</th>
+                <th>Shipper ➔ Consignee</th>
+                <th>Category</th>
+                <th>Weight / Vol</th>
+                <th>Assigned Hold</th>
+                <th>Customs Status</th>
+                <th>Shipment State</th>
+                <th>Customs Decision / Manifest Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-cargo">
+              <!-- Rendered dynamically by cargo.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SQL SANDBOX TAB -->
+    <section id="tab-sql" class="tab-content" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">⚡ Interactive SQL Execution Console (Read-Only MySQL Sandbox)</div>
+          <button class="btn btn-secondary btn-sm" id="btn-export-csv" style="display: none;">📥 Export as CSV</button>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Select Pre-compiled Analytical Query</label>
+          <select class="form-select" id="select-sql-preset">
+            <option value="1">Query 1: Cargo Payload & Aircraft Weight Limit Utilization</option>
+            <option value="2">Query 2: Passenger Flight Itinerary & Checked Baggage Audit</option>
+            <option value="3">Query 3: Flight Crew Duty Hour Exceedance & Safety Audit</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <textarea class="form-input" id="sql-query-editor" rows="8" style="width: 100%; font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-cyan); line-height: 1.4;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btn-run-sql">Execute SQL Query</button>
+          <div id="sql-meta-info" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+        </div>
+
+        <div style="margin-top: 1.5rem;" class="data-table-container">
+          <table class="data-table" id="table-sql-results">
+            <thead id="thead-sql-results"></thead>
+            <tbody id="tbody-sql-results"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. ERD MODEL TAB -->
+    <section id="tab-erd" class="tab-content" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🗄️ Relational Entity-Relationship Diagram (22-Table Architecture)</div>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">
+          Click any database table entity below to inspect primary keys, column constraints, data types, and relational foreign key connections.
+        </p>
+
+        <div class="stats-grid" id="erd-cards-container">
+          <!-- Rendered dynamically by erdViewer.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODALS -->
+
+  <!-- MODAL: SEAT SELECTION MAP -->
+  <div class="modal-overlay" id="modal-seat-picker">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-seat-picker')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 0.25rem;">💺 Aircraft Seat Map</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;" id="modal-seat-flight-title">Flight Selection</p>
+      
+      <div class="seat-map-wrapper">
+        <div class="cabin-section-title">AIRCRAFT CABIN LAYOUT</div>
+        <div class="seat-grid" id="seat-map-grid">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <span id="selected-seat-label" style="font-weight: 600; color: var(--accent-emerald);">Selected Seat: None</span>
+        <button class="btn btn-primary" id="btn-proceed-to-passenger-form" disabled>Proceed to Passenger Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PASSENGER BOOKING FORM -->
+  <div class="modal-overlay" id="modal-passenger-details">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-passenger-details')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">👤 Passenger Registration & Payment</h3>
+      <div style="background: rgba(255,255,255,0.05); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: 0.85rem;">
+        Reserving Flight: <strong id="booking-summary-flight">-</strong> | 
+        Seat: <strong id="booking-summary-seat" style="color: var(--accent-emerald);">-</strong> | 
+        Fare: <strong id="booking-summary-fare" style="color: var(--accent-cyan);">-</strong>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" id="pax-first-name" placeholder="Aravind" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" id="pax-last-name" placeholder="Swaminathan" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passport / National ID</label>
+          <input type="text" class="form-input" id="pax-passport" placeholder="Z8912345" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nationality</label>
+          <input type="text" class="form-input" id="pax-nationality" value="Indian" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" class="form-input" id="pax-dob" value="1992-04-15" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-select" id="pax-gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="pax-email" placeholder="aravind@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="pax-phone" placeholder="+91-9840123456" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select class="form-select" id="pax-payment-method">
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+            <option value="UPI">UPI</option>
+            <option value="Net Banking">Net Banking</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="text-align: right; margin-top: 1.25rem;">
+        <button class="btn btn-primary" id="btn-submit-final-booking">Confirm & Pay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BOARDING PASS -->
+  <div class="modal-overlay" id="modal-boarding-pass">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-boarding-pass')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 0.25rem;">🎫 Official Boarding Pass</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Verified passenger check-in issued by Ground Operations.</p>
+      <div class="boarding-pass-card" id="boarding-pass-content"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: MAINTENANCE HISTORY -->
+  <div class="modal-overlay" id="modal-maintenance-history">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-maintenance-history')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">🛠️ Maintenance Log: <span id="maintenance-modal-tail">-</span></h3>
+      <div id="maintenance-modal-content" class="data-table-container"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: MANIFEST CARGO -->
+  <div class="modal-overlay" id="modal-manifest-cargo">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-manifest-cargo')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">📦 Load Cargo to Aircraft Hold</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Air Waybill: <strong id="manifest-modal-awb" style="color: var(--accent-cyan);">-</strong>
+      </p>
+
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label">Select Flight</label>
+        <select class="form-select" id="manifest-flight-id">
+          <option value="1">AI-101 (DEL ➔ LHR) - Boeing 777-300ER</option>
+          <option value="5">EK-501 (BOM ➔ DXB) - Boeing 777-300ER</option>
+          <option value="6">EK-511 (DEL ➔ DXB) - Boeing 777-300ER</option>
+          <option value="7">BA-198 (BOM ➔ LHR) - Boeing 777-300ER</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label">Loading Bay</label>
+        <select class="form-select" id="manifest-loading-bay">
+          <option value="Forward Hold 1">Forward Hold 1</option>
+          <option value="Forward Hold 2">Forward Hold 2</option>
+          <option value="Aft Hold 1">Aft Hold 1</option>
+          <option value="Aft Hold 2">Aft Hold 2</option>
+          <option value="Bulk Hold">Bulk Hold</option>
+        </select>
+      </div>
+
+      <div style="text-align: right;">
+        <button class="btn btn-primary" id="btn-submit-manifest">Verify Payload & Load</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ERD DETAILS -->
+  <div class="modal-overlay" id="modal-erd-details">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-erd-details')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 1rem;" id="erd-modal-title">Table Details</h3>
+      <div id="erd-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: ROLE SWITCHER & LOGIN -->
+  <div class="modal-overlay" id="modal-auth-login">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal('modal-auth-login')" aria-label="Close modal">&times;</button>
+      <h3 style="color: var(--accent-cyan); margin-bottom: 0.5rem;">🔐 Active Session & Role Switcher</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+        Switch simulated persona to test Role-Based Access Control (RBAC) permissions across operational modules.
+      </p>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label">Switch Active Role</label>
+        <select class="form-select" id="select-demo-role">
+          <option value="Admin">Admin (Full System Privileges)</option>
+          <option value="AirlineStaff">AirlineStaff (Flight Dispatch & Bookings)</option>
+          <option value="GroundStaff">GroundStaff (Gates, Check-in & Baggage)</option>
+          <option value="CargoHandler">CargoHandler (Depot & Manifest Loading)</option>
+          <option value="CustomsOfficer">CustomsOfficer (Customs Clearance Inspection)</option>
+          <option value="Passenger">Passenger (Search & Profile View)</option>
+        </select>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-secondary);">
+        <strong>Demo Database Credentials:</strong><br>
+        Username: <code>admin_main</code> | <code>customs_inspector</code> | <code>cargo_depot_mgr</code><br>
+        Default Password: <code>password123</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- VITE BUNDLED ENTRY SCRIPT -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# Build output
+dist/
+coverage/
+
+# macOS files
+.DS_Store
+__MACOSX/
+
+# Logs
+*.log
+npm-debug.log*
