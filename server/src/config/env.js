@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const caPath = path.resolve(__dirname, '../../certs/ca.pem');
+const caPath = process.env.NODE_ENV === 'production'
+  ? '/etc/secrets/ca.pem'
+  : path.resolve(__dirname, '../../certs/ca.pem');
 export const config = {
   port: parseInt(process.env.PORT || '3000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
