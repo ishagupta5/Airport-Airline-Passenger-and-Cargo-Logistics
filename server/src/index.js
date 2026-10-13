@@ -23,7 +23,12 @@ const app = express();
 // Security and utility middleware
 app.use(helmet());
 app.use(cors({
-  origin: [config.corsOrigin, 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:8080'],
+  origin: [
+    config.corsOrigin,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:8080'
+  ],
   credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
